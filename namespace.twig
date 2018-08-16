@@ -1,0 +1,61 @@
+{% extends "class.html.twig" %}
+{% from "macros.twig" import breadcrumbs, render_classes, class_link, namespace_link %}
+{% block body_class 'namespace' %}
+{% block page_id 'namespace:' ~ (node|trim('\\')|replace({'\\': '_'})) %}
+
+{% block below_menu %}
+    <div class="namespace-breadcrumbs">
+        <ol class="breadcrumb">
+            <li><span class="label label-default">Namespace</span></li>
+            {{ breadcrumbs(node) }}
+        </ol>
+    </div>
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="page-header">
+        <h1>{{ node|trim('\\')|default('Global Namespace') }}</h1>
+    </div>
+
+    {% if node.children|length > 0 %}
+        <h2>Namespaces</h2>
+        <div class="namespace-list">
+            {% for ns in node.children|sort_asc %}{{ namespace_link(ns) }}{% endfor %}
+        </div>
+    {% endif %}
+
+    {% set constants = node.inheritedConstants.merge(node.constants) %}
+    {% if constants|length > 0 %}
+        <h2>Constants</h2>
+
+        {{ block('constants') }}
+    {% endif %}
+
+    {% if node.classes|length > 0 %}
+        <h2>Classes</h2>
+        {{ render_classes(node.classes) }}
+    {% endif %}
+
+    {% if node.interfaces|length > 0 %}
+        <h2>Interfaces</h2>
+        {{ render_classes(node.interfaces) }}
+    {% endif %}
+
+    {% if node.traits|length > 0 %}
+        <h2>Traits</h2>
+        {{ render_classes(node.traits) }}
+    {% endif %}
+
+    {% set methods = node.functions %}
+    {% if methods|length > 0 %}
+        <h2>Functions</h2>
+
+        {{ block('methods') }}
+
+        <h2>Details</h2>
+
+        {{ block('methods_details') }}
+    {% endif %}
+
+{% endblock %}

@@ -1,0 +1,52 @@
+{% use 'elements/constant.html.twig' %}
+{% use 'elements/property.html.twig' %}
+{% use 'elements/method.html.twig' %}
+{% use 'elements/namespaces.sidebar.html.twig' %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="robots" content="index, follow, all" />
+    <title>{% block title project.name %}</title>
+
+    {% block head %}
+        <link rel="stylesheet" type="text/css" href="{{ path('css/bootstrap.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ path('css/bootstrap-theme.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ path('css/sami.css') }}">
+
+        {% block stylesheets %}{% endblock %}
+
+        <script src="{{ path('js/jquery-1.11.1.min.js') }}"></script>
+        <script src="{{ path('js/bootstrap.min.js') }}"></script>
+        <script src="{{ path('js/typeahead.min.js') }}"></script>
+        <script src="{{ path('sami.js') }}"></script>
+
+        {% block javascripts %}{% endblock %}
+
+        <meta name="MobileOptimized" content="width">
+        <meta name="HandheldFriendly" content="true">
+        <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+    {% endblock %}
+
+    <link rel="shortcut icon" href="{{ path('images/favicon.ico') }}"/>
+    <link rel="apple-touch-icon" href="{{ path('images/apple-touch-icon.png') }}"/>
+    <link rel="apple-touch-icon" sizes="72x72" href="{{ path('images/apple-touch-icon-72x72.png') }}"/>
+    <link rel="apple-touch-icon" sizes="114x114" href="{{ path('images/apple-touch-icon-114x114.png') }}"/>
+
+    {% if project.config('base_url') %}
+        {%- for version in project.versions -%}
+            <link rel="search"
+                  type="application/opensearchdescription+xml"
+                  href="{{ project.config('base_url')|replace({'%version%': version}) }}/opensearch.xml"
+                  title="{{ project.config('title') }} ({{ version }})" />
+        {% endfor -%}
+    {% endif %}
+</head>
+
+{% block html %}
+    <body id="{% block body_class '' %}" data-name="{% block page_id '' %}" data-root-path="{{ path('.')|trim('.', 'right') }}">
+        {% block content '' %}
+    </body>
+{% endblock %}
+
+</html>

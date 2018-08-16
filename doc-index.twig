@@ -1,0 +1,62 @@
+{% extends "layout/layout.twig" %}
+{% from "macros.twig" import class_link, constant_link, namespace_link, method_link, property_link %}
+{% block title %}Index | {{ parent() }}{% endblock %}
+{% block body_class 'doc-index' %}
+
+{% block page_content %}
+
+    <div class="page-header">
+        <h1>Index</h1>
+    </div>
+
+    {# Generate letter index #}
+    {% set letters = {} -%}
+    {%- for name, element in project.indexes.elements|sort_asc -%}
+        {%- set letter = element.name|trim('\\~')|first|upper -%}
+        {%- set next = letters[letter]|default([])|merge({ (name): element }) -%}
+        {%- set letters = letters|merge({ (letter): next }) -%}
+    {%- endfor -%}
+
+    <ul class="pagination">
+        {% for letter in 'A'..'Z' %}
+            {% if letters[letter] is defined and letters[letter]|length > 1 %}
+                <li><a href="#letter{{ letter|raw }}">{{ letter|raw }}</a></li>
+            {% else %}
+                <li class="disabled"><a href="#letter{{ letter|raw }}">{{ letter|raw }}</a></li>
+            {% endif %}
+        {% endfor %}
+    </ul>
+
+    {% for letter in letters|keys|sort -%}
+        <h2 id="letter{{ letter }}">{{ letter }}</h2>
+        <dl id="index">
+            {%- for element, value in letters[letter] %}
+                {%- if element starts with '~' -%}
+                    <dt>{{ namespace_link(value) }} &mdash; <em>Namespace</em></dt>
+                    <dd>{{ value.summary|markdown|raw }}</dd>
+                {#{%- elseif 'method' == type -%}#}
+                {%- elseif '::' in element and '(' in element -%}
+                    <dt>{{ method_link(value) }}() &mdash; <em>Method in class {{ class_link(value.parent) }}</em></dt>
+                    <dd>{{ value.summary|markdown|raw }}</dd>
+                {#{%- elseif 'property' == type -%}#}
+                {%- elseif '::' in element and '$' in element -%}
+                    <dt>{{ property_link(value) }} &mdash; <em>Property in class {{ class_link(value.parent) }}</em></dt>
+                    <dd>{{ value.summary|markdown|raw }}</dd>
+                {%- elseif '::' in element -%}
+                    <dt>{{ constant_link(value) }} &mdash; <em>Constant in class {{ class_link(value.parent) }}</em></dt>
+                    <dd>{{ value.summary|markdown|raw }}</dd>
+                {%- elseif '(' in element -%}
+                    <dt><a href="{{ value|route('url') }}">{{ value.name }}()</a> &mdash; <em>Function{% if value.namespace != '\\' %} in namespace {{ namespace_link(value.namespace) }}{% endif %}</em></dt>
+                    <dd>{{ value.summary|markdown|raw }}</dd>
+                {#{%- if 'class' == type -%}#}
+                {%- elseif value.abstract is not null -%}
+                    <dt>{{ class_link(value) }} &mdash; <em>Class{% if value.namespace != '\\' %} in namespace {{ namespace_link(value.namespace) }}{% endif %}</em></dt>
+                    <dd>{{ value.summary|markdown|raw }}</dd>
+                {%- else -%}
+                    <dt><a href="{{ value|route('url') }}">{{ value|trim('\\') }}</a> &mdash; <em>Constant{% if value.namespace != '\\' %} in namespace {{ namespace_link(value.namespace) }}{% endif %}</em></dt>
+                    <dd>{{ value.summary|markdown|raw }}</dd>
+                {%- endif %}
+            {%- endfor %}
+        </dl>
+    {%- endfor %}
+{% endblock %}

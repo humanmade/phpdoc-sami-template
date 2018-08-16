@@ -1,0 +1,156 @@
+{% macro namespace_link(namespace) -%}
+    <a href="{{ namespace|route('url') }}">{{ namespace|trim('\\') }}</a>
+{%- endmacro %}
+
+{% macro class_link(class, absolute) -%}
+    {%- from _self import abbr_class -%}
+    {%- set url = class|route('url') -%}
+    {%- if url -%}
+        <a href="{{ class|route('url') }}">
+            {{- abbr_class(class, absolute|default(false)) -}}
+        </a>
+    {%- else -%}
+        {{- abbr_class(class, absolute|default(false)) -}}
+    {%- endif -%}
+{%- endmacro %}
+
+{% macro method_link(method, absolute, classonly) -%}
+    {%- from _self import abbr_class %}
+    <a href="{{ method|route('url') }}">
+        {{- abbr_class(method.parent) }}{% if not classonly|default(false) %}::{{ method.name|raw }}{% endif -%}
+    </a>
+{%- endmacro %}
+
+{% macro property_link(property, absolute, classonly) -%}
+    {%- from _self import abbr_class %}
+    <a href="{{ property|route('url') }}">
+        {{- abbr_class(property.parent) }}{% if not classonly|default(false) %}::${{ property.name|raw }}{% endif -%}
+    </a>
+{%- endmacro %}
+
+{% macro constant_link(constant, absolute, classonly) -%}
+    {%- from _self import abbr_class %}
+    <a href="{{ constant|route('url') }}">
+        {{- abbr_class(constant.parent) }}{% if not classonly|default(false) %}::{{ constant.name|raw }}{% endif -%}
+    </a>
+{%- endmacro %}
+
+{% macro source_link(project, node) -%}
+    {%- set url = node.file|route('url') %}
+    {% if url %}
+        (<a href="{{ url }}">View source</a>)
+    {%- endif %}
+{%- endmacro %}
+
+{% macro method_source_link(method) -%}
+    {#<pre>
+    F: "{{ node.file|route }}"
+    P: "{{ node.path }}"
+    L: "{{ node.line }}"
+    </pre>#}
+    {% if method.sourcepath %}
+        <a href="{{ method.sourcepath }}">line {{ method.line|raw }}</a>
+    {%- else %}
+        line {{ method.line|raw }}
+    {%- endif %}
+{%- endmacro %}
+
+{% macro abbr_class(class, absolute) -%}
+    <abbr title="{{ class }}">{{ ( absolute|default(false) or not class.name ) ? class|trim('\\') : class.name }}</abbr>
+{%- endmacro %}
+
+{% macro type_list(types) -%}
+    {%- from _self import class_link -%}
+    {%- if types|length > 0 -%}
+        {%- for type in types -%}
+            {{ type|route('url') ? class_link( type ) : type|trim('\\') }}
+            {{- not loop.last ? '|' }}
+        {%- endfor %}
+    {% endif -%}
+{%- endmacro -%}
+
+{% macro method_parameters_signature(method) -%}
+    {%- from _self import type_list -%}
+    (
+        {%- for argument in method.arguments %}
+            {{- type_list( argument.types ) -}}
+            {{- argument.isVariadic ? '...' }}{{ argument.name }}
+            {{- argument.default ? ' = ' ~ argument.default }}
+            {%- if not loop.last %}, {% endif %}
+        {%- endfor -%}
+    )
+    {%- if method.response.types|length > 0 -%}
+        :
+        {{ type_list( method.response.types ) -}}
+    {%- endif -%}
+{%- endmacro %}
+
+{% macro render_classes(classes, absolute) -%}
+    {% from _self import class_link, deprecated %}
+
+    <div class="container-fluid underlined">
+        {% for class in classes|sort_asc %}
+            <div class="row">
+                <div class="col-md-6">
+                    {% if class.isInterface %}
+                        <em>{{ class_link(class, absolute) }}</em>
+                    {% else %}
+                        {{ class_link(class, absolute) }}
+                    {% endif %}
+                    {{ deprecated(class) }}
+                </div>
+                <div class="col-md-6">
+                    {{ class.summary|markdown|raw }}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{%- endmacro %}
+
+{% macro breadcrumbs(namespace) %}
+    {%- from _self import breadcrumbs -%}
+    {%- if namespace.parent and namespace.parent.name != '\\' -%}
+        {{ breadcrumbs(namespace.parent) }}
+    {%- endif -%}
+    <li><a href="{{ namespace|route('url') }}">{{ namespace.name|trim('\\')|default('[Global Namespace]') }}</a></li><li class="backslash">\</li>
+{%- endmacro %}
+
+{% macro deprecated(reflection) %}
+    {% if reflection.deprecated %}<small><sup><span class="label label-danger">deprecated</span></sup></small>{% endif %}
+{% endmacro %}
+
+{% macro deprecations(reflection) %}
+    {% from _self import deprecated %}
+
+    {% if reflection.deprecated %}
+        <p>
+            {{ deprecated( reflection )}}
+            {% for tag in reflection.tags.deprecated %}
+                <tr>
+                    <td>{{ tag.version }}</td>
+                    <td>{{ tag.description }}</td>
+                </tr>
+            {% endfor %}
+        </p>
+    {% endif %}
+{% endmacro %}
+
+{% macro todo(reflection) %}
+    {% if reflection.todo %}<small><sup><span class="label label-info">todo</span></sup></small>{% endif %}
+{% endmacro %}
+
+{% macro todos(reflection) %}
+    {% from _self import todo %}
+
+    {% if reflection.todo %}
+        <p>
+            {{ todo(reflection )}}
+            {% for tag in reflection.todo %}
+                <tr>
+                    <td>{{ tag[0]|raw }}</td>
+                    <td>{{ tag[1:]|join(' ')|raw }}</td>
+                    </tr>
+            {% endfor %}
+        </p>
+    {% endif %}
+{% endmacro %}

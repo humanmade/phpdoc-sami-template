@@ -1,0 +1,285 @@
+{% extends "layout/layout.twig" %}
+{% from "macros.twig" import render_classes, breadcrumbs, namespace_link, class_link, property_link, method_link, source_link, method_source_link, deprecated, deprecations, todo, todos %}
+{% block title %}{{ node|trim('\\')|default('Global Namespace')|raw }} | {{ parent() }}{% endblock %}
+{% block body_class 'class' %}
+{% block page_id 'class:' ~ (node|trim('\\')|replace({'\\': '_'})) %}
+
+{% block below_menu %}
+    {% if node.namespace %}
+        <div class="namespace-breadcrumbs">
+            <ol class="breadcrumb">
+                <li><span class="label label-default">class</span></li>
+                {{ breadcrumbs(node.namespace) -}}
+                <li>{{ node.name }}</li>
+            </ol>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block page_content %}
+
+    <div class="page-header">
+        <h1>
+            {{ node.name }}
+            {{ deprecated(node) }}
+        </h1>
+    </div>
+
+    <p>{{ block('class_signature') }}</p>
+
+    {{ deprecations(node) }}
+
+    {% if node.summary or node.description %}
+        <div class="description">
+            {% if node.summary -%}
+                {{ node.summary|markdown|raw }}
+            {%- endif %}
+            {% if node.description -%}
+                {{ node.description|markdown|raw }}
+            {%- endif %}
+            {% if project.config('insert_todos') == true %}
+                {{ todos(node) }}
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% if node.usedTraits|length > 0 %}
+        <h2>Traits</h2>
+
+        {{ render_classes(node.usedTraits) }}
+    {% endif %}
+
+    {% set constants = node.inheritedConstants.merge(node.constants) %}
+    {% if constants|length > 0 %}
+        <h2>Constants</h2>
+
+        {{ block('constants') }}
+    {% endif %}
+
+    {% set properties = node.inheritedProperties.merge(node.properties.merge(node.magicProperties)) %}
+    {% if properties|length > 0 %}
+        <h2>Properties</h2>
+
+        {{ block('properties') }}
+    {% endif %}
+
+    {% set methods = node.inheritedMethods.merge(node.methods.merge(node.magicMethods)) %}
+    {% if methods|length > 0 %}
+        <h2>Methods</h2>
+
+        {{ block('methods') }}
+
+        <h2>Details</h2>
+
+        {{ block('methods_details') }}
+    {% endif %}
+
+{% endblock %}
+
+{% block class_signature -%}
+    {% if not node.interface and node.abstract %}abstract {% endif %}
+    {% if node.final %}final {% endif %}
+    {#{{ node.categoryName|raw }}#}class
+    <strong>{{ node.name|raw }}</strong>
+    {%- if node.parent %}
+        extends {{ class_link(node.parent) }}
+    {%- endif %}
+    {%- if node.interfaces|length > 0 %}
+        implements
+        {% for interface in node.interfaces %}
+            {{- class_link(interface) }}
+            {%- if not loop.last %}, {% endif %}
+        {%- endfor %}
+    {%- endif %}
+    {{- source_link(project, node) }}
+{% endblock %}
+
+{% block method_signature -%}
+    {% if method.final %}final{% endif %}
+    {% if method.abstract %}abstract{% endif %}
+    {{ method.visibility }}
+    {% if method.static %}static{% endif %}
+    <strong>{{ method.name|raw }}</strong>{{ block('method_parameters_signature') }}
+{%- endblock %}
+
+{% block method_parameters_signature -%}
+    {%- from "macros.twig" import method_parameters_signature -%}
+    {{ method_parameters_signature(method) }}
+    {{ deprecated(method) }}
+{%- endblock %}
+
+{% block parameters %}
+    <table class="table table-condensed">
+        {% for argument in method.arguments %}
+            <tr>
+                <td>{{ argument.types|route|join('|')|raw }}</td>
+                <td>{{- argument.isVariadic ? '...' }}{{ argument.name }}</td>
+                <td>{{ argument.description|markdown|raw }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+{% block return %}
+    <table class="table table-condensed">
+        <tr>
+            <td>{{ method.response.types|route|join('|')|raw }}</td>
+            <td>{{ method.response.description|markdown|raw }}</td>
+        </tr>
+    </table>
+{% endblock %}
+
+{% block exceptions %}
+    <table class="table table-condensed">
+        {% for exception in method.tags.throws %}
+            <tr>
+                <td>{{ exception.types|route|join('|')|raw }}</td>
+                <td>{{ exception.description|markdown|raw }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+{% block see %}
+    <table class="table table-condensed">
+        {% for see in method.see %}
+            <tr>
+                <td>
+                    {% if see[4] %}
+                        <a href="{{see[4]}}">{{see[4]}}</a>
+                    {% elseif see[3] %}
+                        {{ method_link(see[3], false, false) }}
+                    {% elseif see[2] %}
+                        {{ class_link(see[2]) }}
+                    {% else %}
+                        {{ see[0]|raw }}
+                    {% endif %}
+                </td>
+                <td>{{ see[1]|raw }}</td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+{% block constants %}
+    <table class="table table-condensed">
+        {% for constant in constants %}
+            <tr>
+                <td>{{ constant.name }}</td>
+                <td class="last">
+                    <p><em>{{ constant.summary|markdown|raw }}</em></p>
+                    <p>{{ constant.description|markdown|raw }}</p>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+{% block properties %}
+    <table class="table table-condensed">
+        {% for property in properties %}
+            <tr>
+                <td class="type" id="property_{{ property.name|raw }}">
+                    {{ property.visibility }}
+                    {% if property.static %}static{% endif %}
+                    {{ property.types ? property.types|route|join('|')|raw }}
+                </td>
+                <td>${{ property.name|raw }}</td>
+                <td class="last">{{ property.summary|markdown|raw }}</td>
+                <td>
+                    {%- if property.parent is not same as(node) -%}
+                        <small>from&nbsp;{{ property_link(property, false, true) }}</small>
+                    {%- endif -%}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
+
+{% block methods %}
+    <div class="container-fluid underlined">
+        {% for method in methods %}
+            <div class="row">
+                <div class="col-md-2 type">
+                    {% if method.static %}static&nbsp;{% endif %}
+                </div>
+                <div class="col-md-8 type">
+                    <a href="#method_{{ method.name|raw }}">{{ method.name|raw }}</a>{{ block('method_parameters_signature') }}
+                    {% if not method.summary %}
+                        <p class="no-description">No description</p>
+                    {% else %}
+                        {{ method.summary|markdown|raw }}
+                    {%- endif %}
+                </div>
+                <div class="col-md-2">
+                    {%- if method.parent and method.parent is not same as(node) -%}
+                        <small>from&nbsp;{{ method_link(method, false, true) }}</small>
+                    {%- endif -%}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block methods_details %}
+    <div id="method-details">
+        {% for method in methods %}
+            <div class="method-item">
+                {{ block('method') }}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block method %}
+    <h3 id="method_{{ method.name|raw }}">
+        <div class="location">{% if method.parent and method.parent is not same as(node) %}in {{ method_link(method, false, true) }} {% endif %}at {{ method_source_link(method) }}</div>
+        <code>{{ block('method_signature') }}</code>
+    </h3>
+    <div class="details">
+        {{ deprecations(method) }}
+
+        {% if method.summary or method.description %}
+            <div class="method-description">
+                {% if not method.summary and not method.description %}
+                    <p class="no-description">No description</p>
+                {% else %}
+                    {% if method.summary -%}
+                    {{ method.summary|markdown|raw }}
+                    {%- endif %}
+                    {% if method.description -%}
+                    {{ method.description|markdown|raw }}
+                    {%- endif %}
+                {%- endif %}
+                {% if project.config('insert_todos') == true %}
+                    {{ todos(method) }}
+                {% endif %}
+            </div>
+        {% endif %}
+        <div class="tags">
+            {% if method.arguments|length > 0 %}
+                <h4>Parameters</h4>
+
+                {{ block('parameters') }}
+            {% endif %}
+
+            {% if method.response %}
+                <h4>Return Value</h4>
+
+                {{ block('return') }}
+            {% endif %}
+
+            {% if method.tags.throws %}
+                <h4>Exceptions</h4>
+
+                {{ block('exceptions') }}
+            {% endif %}
+
+            {% if method.see %}
+                <h4>See also</h4>
+
+                {{ block('see') }}
+            {% endif %}
+        </div>
+    </div>
+{% endblock %}

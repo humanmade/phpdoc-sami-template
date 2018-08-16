@@ -1,0 +1,32 @@
+{% extends "layout/layout.twig" %}
+{% block title %}Namespaces | {{ parent() }}{% endblock %}
+{% block body_class 'namespaces' %}
+
+{% from _self import print_node %}
+{% macro print_node(node) %}
+    {% from _self import print_node %}
+    <li><a href="{{ node|route('url') }}">{{ node|trim('\\') }}</a></li>
+    {% for namespace in node.children|sort_asc %}
+        {{ print_node(namespace) }}
+    {% endfor %}
+{% endmacro %}
+
+{% block page_content %}
+    <div class="page-header">
+        <h1>Namespaces</h1>
+    </div>
+
+    {% if node.children|length > 0 %}
+        <div class="namespaces clearfix">
+            {% for namespace in node.children|sort_asc %}
+                <div class="namespace-container">
+                    <h2>{{ namespace|trim('\\') }}</h2>
+                    <ul>
+                        {{ print_node( namespace ) }}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+{% endblock %}

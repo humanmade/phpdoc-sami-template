@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8"?>
+<template>
+	<author>Ryan McCue</author>
+	<email></email>
+	<version>1.0.0</version>
+	<copyright>Mike van Riel 2013</copyright>
+	<description><![CDATA[
+
+			To improve performance you can add the following to your .htaccess:
+
+			<ifModule mod_deflate.c>
+					<filesMatch "\.(js|css|html)$">
+							SetOutputFilter DEFLATE
+					</filesMatch>
+			</ifModule>
+	]]></description>
+	<parameters>
+		<parameter key="twig-debug">true</parameter>
+		<parameter key="twig-extension">HM\Samish\Extension</parameter>
+	</parameters>
+	<transformations>
+		<!-- Copy static assets -->
+		<transformation
+			writer="FileIo"
+			query="copy"
+			source="templates/samish/images"
+			artifact="images"
+		/>
+		<transformation
+			writer="FileIo"
+			query="copy"
+			source="templates/samish/css"
+			artifact="css"
+		/>
+		<transformation
+			writer="FileIo"
+			query="copy"
+			source="templates/samish/js"
+			artifact="js"
+		/>
+		<transformation
+			writer="FileIo"
+			query="copy"
+			source="templates/samish/fonts"
+			artifact="fonts"
+		/>
+
+		<!-- Generate indexes -->
+		<transformation
+			writer="twig"
+			query="namespace"
+			source="templates/samish/namespaces.twig"
+			artifact="index.html"
+		/>
+		<transformation
+			writer="twig"
+			source="templates/samish/classes.twig"
+			artifact="classes.html"
+		/>
+		<transformation
+			writer="twig"
+			source="templates/samish/interfaces.twig"
+			artifact="interfaces.html"
+		/>
+		<transformation
+			writer="twig"
+			source="templates/samish/search.twig"
+			artifact="search.html"
+		/>
+		<transformation
+			writer="twig"
+			source="templates/samish/doc-index.twig"
+			artifact="doc-index.html"
+		/>
+		<transformation
+			writer="twig"
+			query="namespace"
+			source="templates/samish/sami.js.twig"
+			artifact="sami.js"
+		/>
+
+		<!-- Generate generic files -->
+		<!-- https://github.com/phpDocumentor/phpDocumentor2/pull/2009 -->
+		<transformation
+			writer="twig"
+			query="partials"
+			source="templates/samish/partial.twig"
+			artifact="partials/{{name}}.html"
+		/>
+
+		<!-- Generate symbol files -->
+		<transformation
+			writer="twig"
+			query="indexes.namespaces"
+			source="templates/samish/namespace.twig"
+		/>
+		<transformation
+			writer="twig"
+			query="indexes.classes"
+			source="templates/samish/class.twig"
+		/>
+		<transformation
+			writer="twig"
+			query="indexes.interfaces"
+			source="templates/samish/class.twig"
+		/>
+		<transformation
+			writer="twig"
+			query="indexes.traits"
+			source="templates/samish/class.twig"
+		/>
+
+		<!-- Generate source files -->
+		<!--
+		<transformation
+			writer="twig"
+			query="files"
+			source="templates/samish/file.html.twig"
+		/>
+		<transformation
+			writer="twig"
+			query="files"
+			source="templates/samish/file.source.txt.twig" artifact="files/{{path}}.txt"
+		/>
+		-->
+
+		<!-- Generate meta files -->
+		<!--
+		<transformation
+			writer="twig"
+			source="templates/samish/reports/markers.html.twig"
+			artifact="reports/markers.html"
+		/>
+		<transformation
+			writer="twig"
+			source="templates/samish/reports/errors.html.twig"
+			artifact="reports/errors.html"
+		/>
+		<transformation
+			writer="twig"
+			source="templates/samish/reports/deprecated.html.twig"
+			artifact="reports/deprecated.html"
+		/>
+		-->
+
+		<!-- Generate graphs -->
+		<!--
+		<transformation
+			writer="twig"
+			source="templates/samish/graphs/class.html.twig"
+			artifact="graphs/class.html"
+		/>
+		<transformation
+			writer="Graph"
+			source="Class"
+			artifact="graphs/classes.svg"
+		/>
+		-->
+	</transformations>
+</template>
