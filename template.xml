@@ -19,25 +19,25 @@
 		<transformation
 			writer="FileIo"
 			query="copy"
-			source="templates/samish/images"
+			source="templates/phpdoc-sami-template/images"
 			artifact="images"
 		/>
 		<transformation
 			writer="FileIo"
 			query="copy"
-			source="templates/samish/css"
+			source="templates/phpdoc-sami-template/css"
 			artifact="css"
 		/>
 		<transformation
 			writer="FileIo"
 			query="copy"
-			source="templates/samish/js"
+			source="templates/phpdoc-sami-template/js"
 			artifact="js"
 		/>
 		<transformation
 			writer="FileIo"
 			query="copy"
-			source="templates/samish/fonts"
+			source="templates/phpdoc-sami-template/fonts"
 			artifact="fonts"
 		/>
 
@@ -45,33 +45,33 @@
 		<transformation
 			writer="twig"
 			query="namespace"
-			source="templates/samish/namespaces.twig"
+			source="templates/phpdoc-sami-template/namespaces.twig"
 			artifact="index.html"
 		/>
 		<transformation
 			writer="twig"
-			source="templates/samish/classes.twig"
+			source="templates/phpdoc-sami-template/classes.twig"
 			artifact="classes.html"
 		/>
 		<transformation
 			writer="twig"
-			source="templates/samish/interfaces.twig"
+			source="templates/phpdoc-sami-template/interfaces.twig"
 			artifact="interfaces.html"
 		/>
 		<transformation
 			writer="twig"
-			source="templates/samish/search.twig"
+			source="templates/phpdoc-sami-template/search.twig"
 			artifact="search.html"
 		/>
 		<transformation
 			writer="twig"
-			source="templates/samish/doc-index.twig"
+			source="templates/phpdoc-sami-template/doc-index.twig"
 			artifact="doc-index.html"
 		/>
 		<transformation
 			writer="twig"
 			query="namespace"
-			source="templates/samish/sami.js.twig"
+			source="templates/phpdoc-sami-template/sami.js.twig"
 			artifact="sami.js"
 		/>
 
@@ -80,7 +80,7 @@
 		<transformation
 			writer="twig"
 			query="partials"
-			source="templates/samish/partial.twig"
+			source="templates/phpdoc-sami-template/partial.twig"
 			artifact="partials/{{name}}.html"
 		/>
 
@@ -88,22 +88,22 @@
 		<transformation
 			writer="twig"
 			query="indexes.namespaces"
-			source="templates/samish/namespace.twig"
+			source="templates/phpdoc-sami-template/namespace.twig"
 		/>
 		<transformation
 			writer="twig"
 			query="indexes.classes"
-			source="templates/samish/class.twig"
+			source="templates/phpdoc-sami-template/class.twig"
 		/>
 		<transformation
 			writer="twig"
 			query="indexes.interfaces"
-			source="templates/samish/class.twig"
+			source="templates/phpdoc-sami-template/class.twig"
 		/>
 		<transformation
 			writer="twig"
 			query="indexes.traits"
-			source="templates/samish/class.twig"
+			source="templates/phpdoc-sami-template/class.twig"
 		/>
 
 		<!-- Generate source files -->
@@ -111,12 +111,12 @@
 		<transformation
 			writer="twig"
 			query="files"
-			source="templates/samish/file.html.twig"
+			source="templates/phpdoc-sami-template/file.html.twig"
 		/>
 		<transformation
 			writer="twig"
 			query="files"
-			source="templates/samish/file.source.txt.twig" artifact="files/{{path}}.txt"
+			source="templates/phpdoc-sami-template/file.source.txt.twig" artifact="files/{{path}}.txt"
 		/>
 		-->
 
@@ -124,17 +124,17 @@
 		<!--
 		<transformation
 			writer="twig"
-			source="templates/samish/reports/markers.html.twig"
+			source="templates/phpdoc-sami-template/reports/markers.html.twig"
 			artifact="reports/markers.html"
 		/>
 		<transformation
 			writer="twig"
-			source="templates/samish/reports/errors.html.twig"
+			source="templates/phpdoc-sami-template/reports/errors.html.twig"
 			artifact="reports/errors.html"
 		/>
 		<transformation
 			writer="twig"
-			source="templates/samish/reports/deprecated.html.twig"
+			source="templates/phpdoc-sami-template/reports/deprecated.html.twig"
 			artifact="reports/deprecated.html"
 		/>
 		-->
@@ -143,7 +143,7 @@
 		<!--
 		<transformation
 			writer="twig"
-			source="templates/samish/graphs/class.html.twig"
+			source="templates/phpdoc-sami-template/graphs/class.html.twig"
 			artifact="graphs/class.html"
 		/>
 		<transformation
