@@ -3,16 +3,12 @@
 	<author>Ryan McCue</author>
 	<email></email>
 	<version>1.0.0</version>
-	<copyright>Mike van Riel 2013</copyright>
+	<copyright></copyright>
 	<description><![CDATA[
+		Sami-style template for phpDocumentor. Based off Sami and phpDocumentor's "clean" template.
 
-			To improve performance you can add the following to your .htaccess:
-
-			<ifModule mod_deflate.c>
-					<filesMatch "\.(js|css|html)$">
-							SetOutputFilter DEFLATE
-					</filesMatch>
-			</ifModule>
+		Sami is copyright (c) 2010-2017 Fabien Potencier.
+		phpDocumentor is copyright (c) 2013 Mike van Riel.
 	]]></description>
 	<parameters>
 		<parameter key="twig-debug">true</parameter>
