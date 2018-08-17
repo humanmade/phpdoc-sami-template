@@ -10,10 +10,12 @@
 		Sami is copyright (c) 2010-2017 Fabien Potencier.
 		phpDocumentor is copyright (c) 2013 Mike van Riel.
 	]]></description>
+	<!-- Uncomment the following for development -->
+	<!--
 	<parameters>
 		<parameter key="twig-debug">true</parameter>
-		<parameter key="twig-extension">HM\Samish\Extension</parameter>
 	</parameters>
+	-->
 	<transformations>
 		<!-- Copy static assets -->
 		<transformation
